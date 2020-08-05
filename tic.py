@@ -1,18 +1,18 @@
 from random import randint
-from itertools import cycle
+from itertools import cycle, chain
 
 
 class Board:
     def __init__(self):
         self._board = [["-"]*3 for i in range(3)]
 
-    def place_symbol(self, player, tile):
+    def place_symbol(self, symbol, tile):
         """Try to place the player inside the tile
         The important thing here is that it returns None if it fails
         """
         row, colmn = tile
         if self._board[row][colmn] == "-":
-            self._board[row][colmn] = player
+            self._board[row][colmn] = symbol
             return True
 
     def check_win(self):
@@ -40,10 +40,10 @@ class Board:
         return any(len(set(lst)) == 1 and lst[0] != "-" for lst in checks)
 
     def is_full(self):
-        return "-" not in (self._board[0]+self._board[1]+self._board[2])
+        return "-" not in set(chain(*self._board))
 
     def __str__(self):
-        return '\n'.join(' '.join([str(tile) for tile in row]) for row in self._board)
+        return '\n'.join(' '.join(row) for row in self._board)
 
 
 class Player:
@@ -52,8 +52,6 @@ class Player:
         self.symbol = symbol
         self.name = name
         self.score = 0
-    def __str__(self):
-        return self.symbol
 
 def get_player_input(choices, text=''):
     while True:
@@ -103,7 +101,7 @@ def main():
             else:
                 row, colmn = randint(0, 2), randint(0, 2)
 
-            result = board.place_symbol(player, (row, colmn))
+            result = board.place_symbol(player.symbol, (row, colmn))
             if result is None:
                 if player.is_human:
                     print("Enter in a non-full tile")
@@ -122,7 +120,7 @@ def main():
             elif board.is_full():
                 print("It's a draw!")
 
-            again = input("another game?(y/n)")
+            again = input("Another game?(y/n)")
             if again == "y":
                 board = Board()
                 continue
