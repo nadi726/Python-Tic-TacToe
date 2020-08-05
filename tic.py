@@ -8,7 +8,7 @@ class Board:
 
     def place_symbol(self, symbol, tile):
         """Try to place the player inside the tile
-        The important thing here is that it returns None if it fails
+        Returns True if successful and None otherwise
         """
         row, colmn = tile
         if self._board[row][colmn] == "-":
@@ -56,6 +56,7 @@ class Player:
 def get_player_input(choices, text=''):
     while True:
         inpt = input(text)
+        # Once the input is valid, break from the function and return it.
         if inpt in choices:
             return inpt
         print(f"Enter one of the following: {', '.join(choices)}")
@@ -102,10 +103,12 @@ def main():
                 row, colmn = randint(0, 2), randint(0, 2)
 
             result = board.place_symbol(player.symbol, (row, colmn))
+            # Result is invalid
             if result is None:
                 if player.is_human:
                     print("Enter in a non-full tile")
                 continue
+            # Result is valid
             else:
                 break
 
@@ -122,8 +125,11 @@ def main():
 
             again = input("Another game?(y/n)")
             if again == "y":
+                # Initialize board and start a new game with the losing player
+                # as the first one to go
                 board = Board()
                 continue
+            # Finish execution
             return
 
 
