@@ -55,6 +55,53 @@ class Player:
     def __str__(self):
         return self.symbol
 
+class Game:
+    def __init__(self, players):
+        self.players = players
+        self.board = Board()
+
+    def play(self):
+        # For player row and colmn input
+        options = ('1', '2', '3')
+        
+        for player in cycle(self.players):
+            print(self.board)
+            print(f"It's {player.name}'s turn")
+
+            # The actual turn of the player
+            while True:
+                if player.is_human:
+                    row = int(get_player_input(options, "Enter row number(1-3): ")) - 1
+                    colmn = int(get_player_input(options, "Enter column number(1-3): ")) - 1
+                else:
+                    row, colmn = randint(0, 2), randint(0, 2)
+
+                result = self.board.place_symbol(player, (row, colmn))
+                if result is None:
+                    if player.is_human:
+                        print("Enter in a non-full tile")
+                    continue
+                else:
+                    break
+
+            win = self.board.check_win()
+            if win or self.board.is_full():
+                print(self.board)
+                if win:
+                    print(f"player {player.name} won")
+                    player.score += 1
+                    print(f"current scores:\nPlayer {self.players[0].name}: {self.players[0].score}")
+                    print(f"Player {self.players[1].name}: {self.players[1].score}")
+                elif self.board.is_full():
+                    print("It's a draw!")
+
+                again = input("another game?(y/n)")
+                if again == "y":
+                    self.board = Board()
+                    continue
+                return
+
+
 def get_player_input(choices, text=''):
     while True:
         inpt = input(text)
@@ -86,47 +133,9 @@ def main():
 
     player1 = Player(player1_is_human, "X", player1_name)
     player2 = Player(player2_is_human, "O", player2_name)
-    players = [player1, player2]
-    board = Board()
-    # For player row and colmn input
-    options = ('1', '2', '3')
+    game  = Game([player1, player2])
 
-    for player in cycle(players):
-        print(board)
-        print(f"It's {player.name}'s turn")
-
-        # The actual turn of the player
-        while True:
-            if player.is_human:
-                row = int(get_player_input(options, "Enter row number(1-3): ")) - 1
-                colmn = int(get_player_input(options, "Enter column number(1-3): ")) - 1
-            else:
-                row, colmn = randint(0, 2), randint(0, 2)
-
-            result = board.place_symbol(player, (row, colmn))
-            if result is None:
-                if player.is_human:
-                    print("Enter in a non-full tile")
-                continue
-            else:
-                break
-
-        win = board.check_win()
-        if win or board.is_full():
-            print(board)
-            if win:
-                print(f"player {player.name} won")
-                player.score += 1
-                print(f"current scores:\nPlayer {players[0].name}: {players[0].score}")
-                print(f"Player {players[1].name}: {players[1].score}")
-            elif board.is_full():
-                print("It's a draw!")
-
-            again = input("another game?(y/n)")
-            if again == "y":
-                board = Board()
-                continue
-            return
+    game.play()
 
 
 if __name__ == '__main__':
